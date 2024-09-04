@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<link rel="stylesheet" href="css.css">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="description"	content="Data Visualisation Exercise 1"/>
+	<meta name="keywords"		  content="HTML, CSS"/>
+	<meta name="author"			  content="Your name here"/>
+
+	<title>Lab2.1</title>
+	<!--Insert description of exercise  -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+	<style>
+
+
+	</style>
+
+</head>
+
+<body>
+	<a href="LimCheeYung_Main.html">
+        <button>Home</button>
+        </a>
+        <a href="Lab2.1.html">
+            <button>Lab2.1</button>
+        </a>
+        <a href="Lab2.2.html">
+            <button>Lab2.2</button>
+        </a>
+        <a href="Lab2.3.html">
+            <button>Lab2.3</button>
+        </a>
+        <a href="Lab2.4.html">
+            <button>Lab2.4</button>
+        </a>
+
+	<h1></h1>
+	<h2>Author of Interesting Article</h2>
+
+    <script>
+        var dataset = [14, 5, 26, 23, 9];
+        var color1=d3.color("blue");
+
+        d3.select("body")
+            .selectAll("p")
+            .data(dataset)
+            .enter()
+            .append("p")
+            .style("color",function(d){
+                if(d>10){
+                    return "blue"
+                }
+            })
+            .text(function(d)   {
+                if (d>10){
+                    return "Warning: NAME watched " + d + "cat videos today.";
+                }
+                else{
+                    return "Name watched " + d + "cat videos today.";
+                }  
+            });
+    </script>
+
+	<footer>COS30045 Data Visualisation</footer>
+
+</body>
+</html>

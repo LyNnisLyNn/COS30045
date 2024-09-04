@@ -1,0 +1,17 @@
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: pink;
+    color: white;
+    text-align: center;
+ }
+
+ body {
+    background-color: powderblue;
+ }
+
+ h1 {color: grey;}
+
+ p {color:  grey;}

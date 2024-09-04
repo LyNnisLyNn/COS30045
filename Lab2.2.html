@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+	<link rel="stylesheet" href="css.css">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="description"	content="Data Visualisation Exercise 1"/>
+	<meta name="keywords"		  content="HTML, CSS"/>
+	<meta name="author"			  content="Your name here"/>
+
+	<title>Lab2.2</title>
+	<!--Insert description of exercise  -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+	<style>
+    mark { 
+  background-color: yellow;
+  color: black;
+}
+	</style>
+
+</head>
+
+<body>
+	<a href="LimCheeYung_Main.html">
+        <button>Home</button>
+        </a>
+        <a href="Lab2.1.html">
+            <button>Lab2.1</button>
+        </a>
+        <a href="Lab2.2.html">
+            <button>Lab2.2</button>
+        </a>
+        <a href="Lab2.3.html">
+            <button>Lab2.3</button>
+        </a>
+        <a href="Lab2.4.html">
+            <button>Lab2.4</button>
+        </a>
+
+	<h1></h1>
+	<h2>Drawing with Data</h2>
+
+    <mark>Question: Lab2.2 Show the data value just under the top line of the bar.</mark>
+    <br>
+    <script>
+        var w = 500;
+        var h = 200;
+        var barPadding = 2;
+
+        //var dataset = [14,5, 26, 23, 9];
+        var dataset = [14, 21, 4, 30, 15, 26, 23, 9];
+        
+        var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h)
+                    .attr("fill", "rgb(255,0,255)");
+
+        svg.selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            .attr("x", function(d, i) {
+                return i * (w / dataset.length);
+            })
+            .attr("y", function(d){
+                return h -(d*4)
+            })
+            .attr("width", function(d){
+                return (w/dataset.length-barPadding);
+            })
+            .attr("height", function(d){
+                return d*4;
+            });
+
+            svg.selectAll("text")
+    .data(dataset)
+    .enter()
+    .append("text")
+    .text(function(d) {
+        return d;
+    })
+    .attr("fill", "black")
+    .attr("x", function(d, i) {
+        return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2 - 8;  // Center text horizontally
+    })
+    .attr("y", function(d) {
+        return h - (d * 4) + 12;  // Position text slightly above the top of the bar
+    })
+    .attr("text-anchor", "middle");  // Center the text
+    </script>
+
+	<footer>COS30045 Data Visualisation</footer>
+
+</body>
+</html>
