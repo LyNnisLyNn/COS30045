@@ -1,17 +1,62 @@
-footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: pink;
-    color: white;
-    text-align: center;
- }
+		body {
+			background-color: #e6f7ff; /* Light baby blue background */
+			font-family: Arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			text-align: center; /* Centering all content */
+		}
 
- body {
-    background-color: powderblue;
- }
+		/* Styling for headings */
+		h1 {
+			color: #4da6ff; /* Soft blue */
+			font-size: 2.5rem;
+		}
 
- h1 {color: grey;}
+		/* Styling for paragraph text */
+		p {
+			color: #4d4d4d; /* Dark grey */
+			font-size: 1rem;
+		}
 
- p {color:  grey;}
+		/* Main page button styling */
+		.main-button {
+			background-color: #80c1ff; /* Baby blue for buttons */
+			border: 2px solid #4da6ff; /* Darker blue border */
+			color: white;
+			font-size: 1.1rem;
+			padding: 10px 20px;
+			margin: 10px;
+			cursor: pointer;
+			border-radius: 8px; /* Rounded corners */
+			transition: background-color 0.3s ease; /* Smooth hover effect */
+		}
+
+		.main-button:hover {
+			background-color: #4da6ff; /* Darker blue on hover */
+		}
+
+		/* Styling for the footer */
+		footer {
+			position: fixed;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			background-color: #4da6ff; /* Footer darker blue */
+			color: white;
+			text-align: center;
+			padding: 15px;
+			font-size: 1rem;
+			border-top: 3px solid #80c1ff; /* Light blue border on top */
+			box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+		}
+
+		/* Container for navigation buttons on the main page */
+		.nav-container-main {
+			margin-top: 20px;
+			display: inline-block;
+			border: 2px solid #4da6ff;
+			padding: 20px;
+			border-radius: 12px; /* Rounded container */
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+			background-color: #f0faff; /* Very light blue background */
+		}
