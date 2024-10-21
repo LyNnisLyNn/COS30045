@@ -3,9 +3,6 @@ function init() {
     var height = 600;
     var padding = 25;
 
-    var color = d3.scaleOrdinal()
-        .range(["#00FF7F", "#FFA07A", "#9400D3", "#DC143C", "#1E90FF", "#FFD700", "#20B2AA", "#FF69B4", "#808080", "#DDA0DD", "#7FFFD4", "#4682B4"]);
-
     var projection = d3.geoMercator()
         .center([145, -36])
         .translate([width / 2, height / 2])
@@ -22,39 +19,51 @@ function init() {
     // Load the data from the VIC_LGA_unemployment.csv
     d3.csv("VIC_LGA_unemployment.csv", function (d) {
         return {
-            LGA: +d.LGA,
+            LGA: d.LGA.trim(),  // Trim to avoid matching issues
             unemployed: +d.unemployed
         };
     }).then(function (data) {
+
+        // Get the min and max unemployment values to define the quantize scale's domain
+        var minValue = d3.min(data, d => d.unemployed);
+        var maxValue = d3.max(data, d => d.unemployed);
+
+        // Define a color scale using d3.scaleQuantize() with purples
+        var color = d3.scaleQuantize()
+            .domain([minValue, maxValue])  // Domain from the min to max unemployment values
+            .range(["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"]);  // Purple color range
+
         // Load the data from the LGA_VIC.json
         d3.json("LGA_VIC.json").then(function (json) {
 
+            // Map unemployment data to corresponding LGAs in the GeoJSON file
             for (var i = 0; i < data.length; i++) {
                 var dataState = data[i].LGA;
-                var dataValue = parseFloat(data[i].unemployed);
+                var dataValue = data[i].unemployed;
 
                 for (var j = 0; j < json.features.length; j++) {
-                    var jsonState = json.features[j].properties.LGA_name;
+                    var jsonState = json.features[j].properties.LGA_name.trim();  // Trim for matching
 
-                    if (dataState == jsonState) {
+                    if (dataState === jsonState) {
                         json.features[j].properties.value = dataValue;
                         break;
                     }
                 }
             }
 
-            // Use colours to draw map paths
+            // Use the color scale to fill the map based on unemployment data
             svg.selectAll("path")
                 .data(json.features)
                 .enter()
                 .append("path")
                 .attr("stroke", "dimgray")
-                .attr("fill", function (d, i) {
-                    return color(i);
+                .attr("fill", function (d) {
+                    var value = d.properties.value;
+                    return value !== undefined ? color(value) : "#dcdcdc";  // Gray for missing values
                 })
                 .attr("d", path);
 
-            // Load the data from the VIC_city.csv
+            // Load the city data and show circles
             d3.csv("VIC_city.csv", function (d) {
                 return {
                     place: d.place,
@@ -62,7 +71,6 @@ function init() {
                     long: +d.lon
                 };
             }).then(function (cityData) {
-                // Show circles for the cities
                 svg.selectAll("circle")
                     .data(cityData)
                     .enter()
@@ -74,7 +82,7 @@ function init() {
                         return projection([d.long, d.lat])[1];
                     })
                     .attr("r", 5)
-                    .style("fill", d3.color("red"))
+                    .style("fill", "red")
                     .style("opacity", 0.75);
             });
         });
