@@ -3,10 +3,6 @@ function init() {
     var height = 600;
     var padding = 25;
 
-    // Define color scale for the choropleth map (using blues)
-    var color = d3.scaleSequential(d3.interpolateBlues)
-        .domain([0, 100]); // Adjust domain according to your data range
-
     var projection = d3.geoMercator()
         .center([145, -36])
         .translate([width / 2, height / 2])
@@ -20,45 +16,61 @@ function init() {
         .attr("width", width + padding)
         .attr("height", height + padding);
 
-    // Load the data from the VIC_LGA_unemployment.csv
+    // Load the unemployment data
     d3.csv("VIC_LGA_unemployment.csv", function (d) {
         return {
-            LGA: +d.LGA,
+            LGA: d.LGA.trim(),  // Trim to avoid matching issues
             unemployed: +d.unemployed
         };
     }).then(function (data) {
-        // Load the data from the LGA_VIC.json
+
+        // Log the data to verify it's loading correctly
+        console.log("Unemployment data:", data);
+
+        // Get the min and max unemployment values for the color scale
+        var minValue = d3.min(data, d => d.unemployed);
+        var maxValue = d3.max(data, d => d.unemployed);
+
+        // Update the color scale domain based on actual data
+        var color = d3.scaleSequential(d3.interpolateBlues)
+            .domain([minValue, maxValue]);
+
+        // Load the geographic data
         d3.json("LGA_VIC.json").then(function (json) {
 
-            // Map unemployment data to corresponding LGAs in the GeoJSON file
+            // Map unemployment data to LGAs
             for (var i = 0; i < data.length; i++) {
                 var dataState = data[i].LGA;
-                var dataValue = parseFloat(data[i].unemployed);
+                var dataValue = data[i].unemployed;
 
+                // Match unemployment data to GeoJSON features
                 for (var j = 0; j < json.features.length; j++) {
-                    var jsonState = json.features[j].properties.LGA_name;
+                    var jsonState = json.features[j].properties.LGA_name.trim();  // Trim for matching
 
-                    if (dataState == jsonState) {
+                    if (dataState === jsonState) {
                         json.features[j].properties.value = dataValue;
                         break;
                     }
                 }
             }
 
-            // Draw the map and use the color scale to fill the areas based on unemployment data
+            // Log to check if data is matched correctly
+            console.log("GeoJSON with unemployment values:", json);
+
+            // Draw the map
             svg.selectAll("path")
                 .data(json.features)
                 .enter()
                 .append("path")
                 .attr("stroke", "dimgray")
                 .attr("fill", function (d) {
-                    // If unemployment data is available, fill based on the value, else light gray
+                    // Get the unemployment value and apply the color scale
                     var value = d.properties.value;
-                    return value ? color(value) : "#dcdcdc";
+                    return value !== undefined ? color(value) : "#dcdcdc";  // Gray for missing values
                 })
                 .attr("d", path);
 
-            // Load the data from the VIC_city.csv
+            // Load city data and show circles
             d3.csv("VIC_city.csv", function (d) {
                 return {
                     place: d.place,
@@ -66,7 +78,6 @@ function init() {
                     long: +d.lon
                 };
             }).then(function (cityData) {
-                // Show circles for the cities
                 svg.selectAll("circle")
                     .data(cityData)
                     .enter()
@@ -78,7 +89,7 @@ function init() {
                         return projection([d.long, d.lat])[1];
                     })
                     .attr("r", 5)
-                    .style("fill", d3.color("red"))
+                    .style("fill", "red")
                     .style("opacity", 0.75);
             });
         });
