@@ -3,8 +3,9 @@ function init() {
     var height = 600;
     var padding = 25;
 
-    var color = d3.scaleOrdinal()
-        .range(["#00FF7F", "#FFA07A", "#9400D3", "#DC143C", "#1E90FF", "#FFD700", "#20B2AA", "#FF69B4", "#808080", "#DDA0DD", "#7FFFD4", "#4682B4"]);
+    // Define color scale for the choropleth map (using blues)
+    var color = d3.scaleSequential(d3.interpolateBlues)
+        .domain([0, 100]); // Adjust domain according to your data range
 
     var projection = d3.geoMercator()
         .center([145, -36])
@@ -29,6 +30,7 @@ function init() {
         // Load the data from the LGA_VIC.json
         d3.json("LGA_VIC.json").then(function (json) {
 
+            // Map unemployment data to corresponding LGAs in the GeoJSON file
             for (var i = 0; i < data.length; i++) {
                 var dataState = data[i].LGA;
                 var dataValue = parseFloat(data[i].unemployed);
@@ -43,14 +45,16 @@ function init() {
                 }
             }
 
-            // Use colours to draw map paths
+            // Draw the map and use the color scale to fill the areas based on unemployment data
             svg.selectAll("path")
                 .data(json.features)
                 .enter()
                 .append("path")
                 .attr("stroke", "dimgray")
-                .attr("fill", function (d, i) {
-                    return color(i);
+                .attr("fill", function (d) {
+                    // If unemployment data is available, fill based on the value, else light gray
+                    var value = d.properties.value;
+                    return value ? color(value) : "#dcdcdc";
                 })
                 .attr("d", path);
 
