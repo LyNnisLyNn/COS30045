@@ -3,6 +3,9 @@ function init() {
     var height = 600;
     var padding = 25;
 
+    var color = d3.scaleOrdinal()
+        .range(["#00FF7F", "#FFA07A", "#9400D3", "#DC143C", "#1E90FF", "#FFD700", "#20B2AA", "#FF69B4", "#808080", "#DDA0DD", "#7FFFD4", "#4682B4"]);
+
     var projection = d3.geoMercator()
         .center([145, -36])
         .translate([width / 2, height / 2])
@@ -16,61 +19,42 @@ function init() {
         .attr("width", width + padding)
         .attr("height", height + padding);
 
-    // Load the unemployment data
+    // Load the data from the VIC_LGA_unemployment.csv
     d3.csv("VIC_LGA_unemployment.csv", function (d) {
         return {
-            LGA: d.LGA.trim(),  // Trim to avoid matching issues
+            LGA: +d.LGA,
             unemployed: +d.unemployed
         };
     }).then(function (data) {
-
-        // Log the data to verify it's loading correctly
-        console.log("Unemployment data:", data);
-
-        // Get the min and max unemployment values for the color scale
-        var minValue = d3.min(data, d => d.unemployed);
-        var maxValue = d3.max(data, d => d.unemployed);
-
-        // Update the color scale domain based on actual data
-        var color = d3.scaleSequential(d3.interpolateBlues)
-            .domain([minValue, maxValue]);
-
-        // Load the geographic data
+        // Load the data from the LGA_VIC.json
         d3.json("LGA_VIC.json").then(function (json) {
 
-            // Map unemployment data to LGAs
             for (var i = 0; i < data.length; i++) {
                 var dataState = data[i].LGA;
-                var dataValue = data[i].unemployed;
+                var dataValue = parseFloat(data[i].unemployed);
 
-                // Match unemployment data to GeoJSON features
                 for (var j = 0; j < json.features.length; j++) {
-                    var jsonState = json.features[j].properties.LGA_name.trim();  // Trim for matching
+                    var jsonState = json.features[j].properties.LGA_name;
 
-                    if (dataState === jsonState) {
+                    if (dataState == jsonState) {
                         json.features[j].properties.value = dataValue;
                         break;
                     }
                 }
             }
 
-            // Log to check if data is matched correctly
-            console.log("GeoJSON with unemployment values:", json);
-
-            // Draw the map
+            // Use colours to draw map paths
             svg.selectAll("path")
                 .data(json.features)
                 .enter()
                 .append("path")
                 .attr("stroke", "dimgray")
-                .attr("fill", function (d) {
-                    // Get the unemployment value and apply the color scale
-                    var value = d.properties.value;
-                    return value !== undefined ? color(value) : "#dcdcdc";  // Gray for missing values
+                .attr("fill", function (d, i) {
+                    return color(i);
                 })
                 .attr("d", path);
 
-            // Load city data and show circles
+            // Load the data from the VIC_city.csv
             d3.csv("VIC_city.csv", function (d) {
                 return {
                     place: d.place,
@@ -78,6 +62,7 @@ function init() {
                     long: +d.lon
                 };
             }).then(function (cityData) {
+                // Show circles for the cities
                 svg.selectAll("circle")
                     .data(cityData)
                     .enter()
@@ -89,7 +74,7 @@ function init() {
                         return projection([d.long, d.lat])[1];
                     })
                     .attr("r", 5)
-                    .style("fill", "red")
+                    .style("fill", d3.color("red"))
                     .style("opacity", 0.75);
             });
         });
