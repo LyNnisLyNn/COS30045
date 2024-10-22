@@ -16,6 +16,16 @@ function init() {
         .attr("width", width + padding)
         .attr("height", height + padding);
 
+    // Create a tooltip div that will be hidden initially
+    var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("position", "absolute")
+        .style("background-color", "white")
+        .style("padding", "5px")
+        .style("border", "1px solid black")
+        .style("border-radius", "5px")
+        .style("visibility", "hidden");
+
     // Load the data from the VIC_LGA_unemployment.csv
     d3.csv("VIC_LGA_unemployment.csv", function (d) {
         return {
@@ -83,7 +93,18 @@ function init() {
                     })
                     .attr("r", 5)
                     .style("fill", "red")
-                    .style("opacity", 0.75);
+                    .style("opacity", 0.75)
+                    .on("mouseover", function (event, d) {
+                        tooltip.style("visibility", "visible") //enable tooltip visibility
+                            .text(d.place); //to show city name
+                    })
+                    .on("mousemove", function (event) {
+                        tooltip.style("top", (event.pageY + 10) + "px")
+                            .style("left", (event.pageX + 10) + "px");
+                    })
+                    .on("mouseout", function () {
+                        tooltip.style("visibility", "hidden");
+                    });
             });
         });
     });
